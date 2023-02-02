@@ -25,8 +25,8 @@ class Tag(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Тэг'
-        verbose_name_plural = 'Тэги'
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
 
     def __str__(self):
         return self.name
@@ -111,53 +111,66 @@ class TagRecipe(models.Model):
     """Модель для связи рецептов и тэгов."""
     tag = models.ForeignKey(
         Tag,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True
+        on_delete=models.CASCADE,
+        related_name='recipes',
+        verbose_name='Тэг'
     )
     recipe = models.ForeignKey(
         Recipe,
-        models.SET_NULL,
-        blank=True,
-        null=True
+        on_delete=models.CASCADE,
+        related_name='tags',
+        verbose_name='Рецепт'
     )
 
     class Meta:
-        verbose_name = 'Связь тэга с рецептом'
-        verbose_name_plural = 'Связи тэгов с рецептами'
+        constraints = [
+            UniqueConstraint(
+                fields=('tag', 'recipe'),
+                name='unique_tag_recipe'
+            ),
+        ]
+        verbose_name = 'Тег рецепта'
+        verbose_name_plural = 'Теги рецепта'
+        ordering = ('recipe',)
 
     def __str__(self):
-        return f'Тэг "{self.tag}" в рецепте {self.recipe}'
+        return f"{self.recipe} - {self.tag}"
 
 
 class IngredientRecipe(models.Model):
     """Модель для связи рецептов и ингредиентов."""
     ingredient = models.ForeignKey(
         Ingredient,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='ingrs_recipes'
+        on_delete=models.CASCADE,
+        related_name='recipes',
+        verbose_name='Ингредиент'
     )
     recipe = models.ForeignKey(
         Recipe,
-        models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='ingrs_recipes'
+        on_delete=models.CASCADE,
+        related_name='ingredients',
+        verbose_name='Рецепт'
     )
-    amount = models.PositiveSmallIntegerField(
+    quantity = models.PositiveSmallIntegerField(
+        verbose_name='Количество',
         validators=[MinValueValidator(
-            1, message='Количество не может быть нулевым.'
+            1, message='Количество не может быть меньше 1.'
         )]
     )
 
     class Meta:
-        verbose_name = 'Связь ингредиента с рецептом'
-        verbose_name_plural = 'Связи ингредиентов с рецептами'
+        constraints = [
+            UniqueConstraint(
+                fields=('ingredient', 'recipe'),
+                name='unique_ingredient_recipe'
+            ),
+        ]
+        verbose_name = 'Ингредиент рецепта'
+        verbose_name_plural = 'Ингредиенты рецепта'
+        ordering = ('recipe',)
 
     def __str__(self):
-        return f'Ингредиент "{self.ingredient}" в рецепте {self.recipe}'
+        return f"{self.ingredient} - {self.quantity}"
 
 
 class FavoriteShoppingCartBaseModel(models.Model):

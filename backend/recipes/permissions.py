@@ -7,8 +7,6 @@ class IsAuthorOrAdminOrReadOnly(permissions.BasePermission):
     message = settings.IS_AUTHOR_OR_ADMIN_ERROR_MESSAGE
 
     def has_permission(self, request, view):
-        # вернула удаленный на первом ревью метод
-        # без него все падает при попытке без токена создать рецепт
         return (
             request.method in permissions.SAFE_METHODS
             or request.user.is_authenticated

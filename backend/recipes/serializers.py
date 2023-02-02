@@ -61,11 +61,15 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         request = self.context.get('request', None)
         if request:
             current_user = request.user
-            return arg0.objects.filter(
+            if arg0.objects.filter(
                 user=current_user.id,
                 recipe=obj.id
-            ).exists()
+            ).exists():
+                return True
+            else:
+                return False
         return None
+
 
     def get_is_in_shopping_cart(self, obj):
         """Возвращает присутствие рецепта в списке покупок."""
@@ -79,37 +83,68 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания рецепта."""
     tags = serializers.PrimaryKeyRelatedField(
+
         queryset=Tag.objects.all(),
+
         many=True
+
     )
+
     ingredients = IngredientRecipeSerializer(
+
         many=True,
+
     )
+
     image = Base64ImageField(max_length=None)
+
     author = CustomUserSerializer(read_only=True)
 
     class Meta:
+
         model = Recipe
+
         fields = (
+
             'id', 'tags', 'author',
+
             'ingredients', 'name', 'image',
+
             'text', 'cooking_time'
+
         )
 
     @staticmethod
     def set_recipe_ingredient(ingredients, recipe):
+
         """Добавляет ингредиенты в рецепт."""
-        ingredient_list = [
-            IngredientRecipe(
-                ingredient=get_object_or_404(
-                    Ingredient, pk=ingredient.get('id').id
-                ),
-                recipe=recipe,
-                amount=ingredient.get('amount'),
-             )
-            for ingredient in ingredients
-        ]
-        ingredient_list.sort(key=(lambda item: item.ingredient.name))
+
+        ingredient_ids = []
+        ingredient_list = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient.get('id').id
+            if ingredient_id in ingredient_ids:
+                continue
+            ingredient_ids.append(ingredient_id)
+
+            ingredient_list.append(
+
+                IngredientRecipe(
+
+                    ingredient=get_object_or_404(
+
+                        Ingredient, pk=ingredient_id
+
+                    ),
+
+                    recipe=recipe,
+
+                    amount=ingredient.get('amount'),
+
+                )
+
+            )
+
         IngredientRecipe.objects.bulk_create(ingredient_list)
 
     def create(self, validated_data):

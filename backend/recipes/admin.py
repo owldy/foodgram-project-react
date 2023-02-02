@@ -1,6 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from recipes.models import Ingredient, Recipe, Tag
+
+from recipes.models import (
+    Ingredient,
+    Recipe,
+    Tag,
+)
 
 
 class TabularInlineRecipeTag(admin.TabularInline):
@@ -49,12 +54,8 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Ингредиенты')
     def get_ingredients(self, obj):
-        return ', '.join(
-            f'{ingr.name} - '
-            f'{obj.ingrs_recipes.filter(ingredient=ingr.id).first().amount} '
-            f'{ingr.measurement_unit} '
-            for ingr in obj.ingredients.all()
-        )
+        ingredients = obj.ingredients.all().values_list('name', flat=True)
+        return ', '.join(ingredients)
 
 
 admin.site.unregister(Group)
