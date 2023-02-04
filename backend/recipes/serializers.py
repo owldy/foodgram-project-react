@@ -1,11 +1,13 @@
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (Favorite, Follow, Ingredient, IngredientRecipe,
-                            Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
+
+from recipes.models import (Favorite, Follow, Ingredient, IngredientRecipe,
+                            Recipe, ShoppingCart, Tag)
 from users.models import CustomUser as User
 from users.serializers import CustomUserSerializer
+
 
 
 class TagSerializer(serializers.ModelSerializer):

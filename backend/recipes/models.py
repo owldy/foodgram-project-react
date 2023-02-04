@@ -151,7 +151,7 @@ class IngredientRecipe(models.Model):
         related_name='ingredients',
         verbose_name='Рецепт'
     )
-    quantity = models.PositiveSmallIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         validators=[MinValueValidator(
             1, message='Количество не может быть меньше 1.'
@@ -170,7 +170,7 @@ class IngredientRecipe(models.Model):
         ordering = ('recipe',)
 
     def __str__(self):
-        return f"{self.ingredient} - {self.quantity}"
+        return f"{self.ingredient} - {self.amount}"
 
 
 class FavoriteShoppingCartBaseModel(models.Model):
