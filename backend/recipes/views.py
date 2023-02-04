@@ -101,7 +101,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shopping_cart__user=request.user
         ).order_by('ingredient__name').values(
             'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(total_quantity=Sum('quantity'))
+        ).annotate(amount=Sum('quantity'))
         return self.get_shopping_cart(ingredients)
 
     @staticmethod
