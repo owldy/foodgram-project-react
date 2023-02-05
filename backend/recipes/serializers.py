@@ -60,7 +60,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def _is_exist(self, arg0, obj):
         """Возвращает информацию о существовании объекта."""
-        request = self.context.get('request', {})
+        request = self.context.get('request')
         if request:
             current_user = request.user
             if arg0.objects.filter(

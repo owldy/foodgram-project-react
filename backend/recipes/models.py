@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
+
 from recipes import validators
 from users.models import CustomUser as User
 
@@ -151,7 +152,7 @@ class IngredientRecipe(models.Model):
         related_name='ingredients',
         verbose_name='Рецепт'
     )
-    amount = models.PositiveSmallIntegerField(
+    quantity = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         validators=[MinValueValidator(
             1, message='Количество не может быть меньше 1.'
