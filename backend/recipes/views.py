@@ -2,7 +2,19 @@ from django.conf import settings
 from django.db.models import Sum
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+
 from recipes.filters import IngredientsFilter, RecipesFilter
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
@@ -10,14 +22,6 @@ from recipes.permissions import IsAuthorOrAdminOrReadOnly
 from recipes.serializers import (FavoriteSerializer, IngredientsSerializer,
                                  RecipeCreateSerializer, RecipeReadSerializer,
                                  ShoppingCartSerializer, TagSerializer)
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
-from rest_framework.response import Response
 
 
 class TagViewSet(viewsets.ModelViewSet):

@@ -103,34 +103,31 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     @staticmethod
-    def set_recipe_ingredient(ingredients, recipe):
-        """Добавляет ингредиенты в рецепт."""
+    def validate(self, data):
+        ingredients = data.get('ingredients', [])
         ingredient_ids = []
-        ingredient_list = []
         for ingredient in ingredients:
             ingredient_id = ingredient.get('id').id
             if ingredient_id in ingredient_ids:
                 raise serializers.ValidationError("Ингредиент уже добавлен")
             ingredient_ids.append(ingredient_id)
+        return data
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(**validated_data)
+        ingredient_list = []
+        for ingredient in ingredients:
             ingredient_list.append(
                 IngredientRecipe(
                     ingredient=get_object_or_404(
-                        Ingredient, pk=ingredient_id
+                        Ingredient, pk=ingredient.get('id').id
                     ),
                     recipe=recipe,
                     amount=ingredient.get('amount'),
                 )
             )
         IngredientRecipe.objects.bulk_create(ingredient_list)
-
-    def create(self, validated_data):
-        """Сохраняет рецепт в БД и возвращает его."""
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        request = self.context.get('request')
-        recipe = Recipe.objects.create(author=request.user, **validated_data)
-        recipe.tags.set(tags)
-        self.set_recipe_ingredient(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
@@ -140,7 +137,18 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         instance.tags.set(tags)
-        self.set_recipe_ingredient(ingredients, instance)
+        ingredient_list = []
+        for ingredient in ingredients:
+            ingredient_list.append(
+                IngredientRecipe(
+                    ingredient=get_object_or_404(
+                        Ingredient, pk=ingredient.get('id').id
+                    ),
+                    recipe=instance,
+                    amount=ingredient.get('amount'),
+                )
+            )
+        IngredientRecipe.objects.bulk_create(ingredient_list)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
