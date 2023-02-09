@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
+from recipes.models import Ingredient, Recipe, Tag
 
-from recipes.models import (
-    Ingredient,
-    Recipe,
-    Tag,
-)
 
 
 class TabularInlineRecipeTag(admin.TabularInline):
