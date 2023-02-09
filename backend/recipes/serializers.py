@@ -35,7 +35,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientRecipe
-        fields = ('id', 'name', 'measurement_unit', 'quantity')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
@@ -137,18 +137,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         instance.tags.set(tags)
-        ingredient_list = []
-        for ingredient in ingredients:
-            ingredient_list.append(
-                IngredientRecipe(
-                    ingredient=get_object_or_404(
-                        Ingredient, pk=ingredient.get('id').id
-                    ),
-                    recipe=instance,
-                    amount=ingredient.get('amount'),
-                )
-            )
-        IngredientRecipe.objects.bulk_create(ingredient_list)
+        self.set_recipe_ingredient(ingredients, instance)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
