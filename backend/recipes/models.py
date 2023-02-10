@@ -2,7 +2,9 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
+
 from recipes import validators
+
 from users.models import CustomUser as User
 
 
